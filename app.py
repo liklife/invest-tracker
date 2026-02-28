@@ -9,6 +9,7 @@ from market.price_cache import get_cached_price  # вместо get_current_pric
 from database.db import db, User, Portfolio, Stock, Transaction, Dividend  # ДОБАВИЛ Stock
 from forms import LoginForm, RegisterForm
 from collections import defaultdict
+import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key-here-2026'  # ПОМЕНЯЙ ПОТОМ
@@ -897,4 +898,5 @@ with app.app_context():
     print("✅ Таблицы пользователей созданы")
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
