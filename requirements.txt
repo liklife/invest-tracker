@@ -5,3 +5,4 @@ flask-wtf
 wtforms
 beautifulsoup4
 requests
+gunicorn
