@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2>💰 Дивиденды: {{ portfolio.name }}</h2>
+    <div>
+        <a href="/update_dividends/{{ portfolio.id }}" style="background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">🔄 Обновить</a>
+        <a href="/portfolio/{{ portfolio.id }}" style="background: #6c757d; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">← Назад</a>
+    </div>
+</div>
+
+{% set total_dividends = 0 %}
+<table style="width: 100%; background: white; border-collapse: collapse; border-radius: 10px; overflow: hidden;">
+    <thead>
+        <tr style="background: #007bff; color: white;">
+            <th style="padding: 12px;">Дата выплаты</th>
+            <th style="padding: 12px;">Дата отсечки</th>
+            <th style="padding: 12px;">Бумага</th>
+            <th style="padding: 12px;">На акцию</th>
+            <th style="padding: 12px;">Сумма</th>
+            <th style="padding: 12px;">Налог</th>
+            <th style="padding: 12px;">Всего</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for d in dividends %}
+        <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">{{ d.date.strftime('%d.%m.%Y') }}</td>
+            <td style="padding: 12px;">{{ d.record_date.strftime('%d.%m.%Y') }}</td>
+            <td style="padding: 12px;">{{ d.stock.name }} ({{ d.stock.ticker }})</td>
+            <td style="padding: 12px;">{{ "%.2f"|format(d.amount_per_share) }} ₽</td>
+            <td style="padding: 12px;">{{ "%.2f"|format(d.total_amount + d.tax) }} ₽</td>
+            <td style="padding: 12px;">{{ "%.2f"|format(d.tax) }} ₽</td>
+            <td style="padding: 12px;"><strong>{{ "%.2f"|format(d.total_amount) }} ₽</strong></td>
+        </tr>
+        {% endfor %}
+
+        {% if not dividends %}
+        <tr>
+            <td colspan="7" style="padding: 50px; text-align: center; color: #999;">
+                Нет дивидендов. <a href="/update_dividends/{{ portfolio.id }}">Обновить</a>
+            </td>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>
+
+{% if dividends %}
+<div style="margin-top: 30px; text-align: right;">
+    <h3>Всего дивидендов: {{ "%.2f"|format(dividends|sum(attribute='total_amount')) }} ₽</h3>
+</div>
+{% endif %}
+{% endblock %}

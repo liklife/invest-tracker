@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>📁 Мои портфели</h2>
+
+<div style="margin: 20px 0;">
+    <a href="/portfolio/new" style="background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">+ Новый портфель</a>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+    {% for portfolio in portfolios %}
+    <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <h3>{{ portfolio.name }}</h3>
+        <p>Валюта: {{ portfolio.currency }}</p>
+        <p>Создан: {{ portfolio.created_at.strftime('%d.%m.%Y') }}</p>
+        <a href="/portfolio/{{ portfolio.id }}" style="color: #007bff;">Открыть →</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div>
+        <h2>📊 {{ portfolio.name }}</h2>
+        <p>Валюта: {{ portfolio.currency }}</p>
+    </div>
+    <div>
+        <select onchange="window.location.href='/portfolio/' + this.value" style="padding: 8px; margin-right: 10px;">
+            {% for p in portfolios %}
+            <option value="{{ p.id }}" {% if p.id == portfolio.id %}selected{% endif %}>{{ p.name }}</option>
+            {% endfor %}
+        </select>
+        <a href="/refresh/{{ portfolio.id }}" style="background: #ffc107; color: black; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-right: 10px;">🔄 Обновить цены</a>
+        <a href="/transactions/{{ portfolio.id }}" style="background: #17a2b8; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-right: 10px;">📋 Сделки</a>
+        <a href="/add_transaction?portfolio_id={{ portfolio.id }}" style="background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">➕ Добавить</a>
+        <a href="/dividends/{{ portfolio.id }}" style="background: #ffc107; color: black; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-right: 10px;">💰 Дивиденды</a>
+        <a href="/dividend_forecast/{{ portfolio.id }}" style="background: #6610f2; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">🔮 Прогноз</a>
+        <a href="/charts/{{ portfolio.id }}" style="background: #17a2b8; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">📊 Графики</a>
+    </div>
+</div>
+
+<div class="update-time" style="text-align: right; color: #666; margin-bottom: 10px;">
+    Последнее обновление: {{ current_time }}
+</div>
+
+<div style="display: flex; gap: 20px; margin-bottom: 30px;">
+    <div style="background: white; padding: 20px; border-radius: 10px; flex: 1;">
+        <h3>💰 Потрачено</h3>
+        <h2>{{ total_spent }} ₽</h2>
+    </div>
+    <div style="background: white; padding: 20px; border-radius: 10px; flex: 1;">
+        <h3>💵 Сейчас</h3>
+        <h2>{{ total_current }} ₽</h2>
+    </div>
+    <div style="background: white; padding: 20px; border-radius: 10px; flex: 1;">
+        <h3>📊 Результат</h3>
+        <h2 style="color: {{ 'green' if profit >= 0 else 'red' }}">
+            {{ profit }} ₽ ({{ profit_percent }}%)
+        </h2>
+    </div>
+</div>
+
+<table style="width: 100%; background: white; border-collapse: collapse; border-radius: 10px; overflow: hidden;">
+    <thead>
+        <tr style="background: #007bff; color: white;">
+            <th style="padding: 12px;">Бумага</th>
+            <th style="padding: 12px;">Тикер</th>
+            <th style="padding: 12px;">Кол-во</th>
+            <th style="padding: 12px;">Ср. цена</th>
+            <th style="padding: 12px;">Тек. цена</th>
+            <th style="padding: 12px;">Источник</th>
+            <th style="padding: 12px;">Потрачено</th>
+            <th style="padding: 12px;">Сейчас</th>
+            <th style="padding: 12px;">Прибыль</th>
+            <th style="padding: 12px;">%</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in portfolio_data %}
+        <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">{{ item.name }}</td>
+            <td style="padding: 12px;">{{ item.ticker }}</td>
+            <td style="padding: 12px;">{{ item.quantity }}</td>
+            <td style="padding: 12px;">{{ item.avg_price }}</td>
+            <td style="padding: 12px;">{{ item.current_price }}</td>
+            <td style="padding: 12px;">
+                <span style="padding: 3px 8px; border-radius: 12px; background: {{ '#28a745' if item.price_source == 'биржа' else '#e9ecef' }}; color: {{ 'white' if item.price_source == 'биржа' else '#495057' }};">
+                    {{ item.price_source }}
+                </span>
+            </td>
+            <td style="padding: 12px;">{{ item.spent }}</td>
+            <td style="padding: 12px;">{{ item.current_value }}</td>
+            <td style="padding: 12px; color: {{ 'green' if item.profit >= 0 else 'red' }};">{{ item.profit }}</td>
+            <td style="padding: 12px; color: {{ 'green' if item.profit_percent >= 0 else 'red' }};">{{ item.profit_percent }}%</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

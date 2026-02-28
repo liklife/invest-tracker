@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2>🔮 Прогноз дивидендов: {{ portfolio.name }}</h2>
+    <div>
+        <a href="/dividends/{{ portfolio.id }}" style="background: #6c757d; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">← История</a>
+        <a href="/portfolio/{{ portfolio.id }}" style="background: #6c757d; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Назад</a>
+    </div>
+</div>
+
+{% if forecasts %}
+    <div style="background: #fff3cd; color: #856404; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        <strong>💰 Ожидаемые дивиденды в ближайший год:</strong> {{ "%.2f"|format(total_expected) }} ₽
+    </div>
+
+    <table style="width: 100%; background: white; border-collapse: collapse; border-radius: 10px; overflow: hidden;">
+        <thead>
+            <tr style="background: #007bff; color: white;">
+                <th style="padding: 12px;">Бумага</th>
+                <th style="padding: 12px;">Тикер</th>
+                <th style="padding: 12px;">Кол-во</th>
+                <th style="padding: 12px;">Прогноз даты</th>
+                <th style="padding: 12px;">На акцию</th>
+                <th style="padding: 12px;">Ожидаемая сумма</th>
+                <th style="padding: 12px;">На основе</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for f in forecasts %}
+            <tr style="border-bottom: 1px solid #ddd;">
+                <td style="padding: 12px;">{{ f.stock.name }}</td>
+                <td style="padding: 12px;">{{ f.stock.ticker }}</td>
+                <td style="padding: 12px;">{{ f.total_quantity }}</td>
+                <td style="padding: 12px;">{{ f.next_date.strftime('%d.%m.%Y') }}</td>
+                <td style="padding: 12px;">{{ "%.2f"|format(f.amount_per_share) }} ₽</td>
+                <td style="padding: 12px;"><strong>{{ "%.2f"|format(f.expected_total) }} ₽</strong></td>
+                <td style="padding: 12px;">{{ f.history_count }} выплат</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div style="background: white; padding: 50px; text-align: center; border-radius: 10px; color: #999;">
+        Недостаточно данных для прогноза.<br>
+        Сначала <a href="/update_dividends/{{ portfolio.id }}">обнови дивиденды</a>.
+    </div>
+{% endif %}
+{% endblock %}

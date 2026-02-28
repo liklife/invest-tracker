@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2>📋 Сделки: {{ portfolio.name }}</h2>
+    <div>
+        <a href="/add_transaction?portfolio_id={{ portfolio.id }}" style="background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">➕ Добавить</a>
+        <a href="/portfolio/{{ portfolio.id }}" style="background: #6c757d; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">← Назад</a>
+    </div>
+</div>
+
+<table style="width: 100%; background: white; border-collapse: collapse; border-radius: 10px; overflow: hidden;">
+    <thead>
+        <tr style="background: #007bff; color: white;">
+            <th style="padding: 12px;">Дата</th>
+            <th style="padding: 12px;">Бумага</th>
+            <th style="padding: 12px;">Тикер</th>
+            <th style="padding: 12px;">Кол-во</th>
+            <th style="padding: 12px;">Цена</th>
+            <th style="padding: 12px;">Комиссия</th>
+            <th style="padding: 12px;">Сумма</th>
+            <th style="padding: 12px;">Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for t in transactions %}
+        <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">{{ t.date }}</td>
+            <td style="padding: 12px;">{{ t.stock_name }}</td>
+            <td style="padding: 12px;">{{ t.ticker }}</td>
+            <td style="padding: 12px;">{{ t.quantity }}</td>
+            <td style="padding: 12px;">{{ "%.2f"|format(t.price) }} ₽</td>
+            <td style="padding: 12px;">{{ "%.2f"|format(t.commission) }} ₽</td>
+            <td style="padding: 12px;">{{ "%.2f"|format(t.total) }} ₽</td>
+            <td style="padding: 12px;">
+                <a href="/delete_transaction/{{ t.id }}" style="color: red; text-decoration: none;" onclick="return confirm('Удалить сделку?')">❌</a>
+            </td>
+        </tr>
+        {% endfor %}
+
+        {% if not transactions %}
+        <tr>
+            <td colspan="8" style="padding: 50px; text-align: center; color: #999;">
+                Нет сделок. <a href="/add_transaction?portfolio_id={{ portfolio.id }}">Добавить первую</a>
+            </td>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>
+{% endblock %}

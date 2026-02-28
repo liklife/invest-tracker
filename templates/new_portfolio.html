@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>➕ Создать новый портфель</h2>
+
+<div style="max-width: 400px; margin: 20px 0; background: white; padding: 30px; border-radius: 10px;">
+    <form method="POST">
+        <div style="margin-bottom: 15px;">
+            <label>Название портфеля:</label>
+            <input type="text" name="name" required style="width: 100%; padding: 8px; margin-top: 5px;" placeholder="Например: Основной">
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label>Валюта:</label>
+            <select name="currency" style="width: 100%; padding: 8px; margin-top: 5px;">
+                <option value="RUB">RUB</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+            </select>
+        </div>
+
+        <button type="submit" style="background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">Создать</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Регистрация - Инвест Трекер{% endblock %}
+
+{% block content %}
+<div style="max-width: 400px; margin: 50px auto; background: white; padding: 30px; border-radius: 10px;">
+    <h2 style="margin-bottom: 20px;">📝 Регистрация</h2>
+
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <div style="margin-bottom: 15px;">
+            {{ form.username.label }}<br>
+            {{ form.username(class="form-control", style="width: 100%; padding: 8px; margin-top: 5px;") }}
+            {% if form.username.errors %}
+                {% for error in form.username.errors %}
+                    <small style="color: red;">{{ error }}</small>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            {{ form.email.label }}<br>
+            {{ form.email(class="form-control", style="width: 100%; padding: 8px; margin-top: 5px;") }}
+            {% if form.email.errors %}
+                {% for error in form.email.errors %}
+                    <small style="color: red;">{{ error }}</small>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            {{ form.password.label }}<br>
+            {{ form.password(class="form-control", style="width: 100%; padding: 8px; margin-top: 5px;") }}
+            {% if form.password.errors %}
+                {% for error in form.password.errors %}
+                    <small style="color: red;">{{ error }}</small>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            {{ form.confirm_password.label }}<br>
+            {{ form.confirm_password(class="form-control", style="width: 100%; padding: 8px; margin-top: 5px;") }}
+            {% if form.confirm_password.errors %}
+                {% for error in form.confirm_password.errors %}
+                    <small style="color: red;">{{ error }}</small>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            {{ form.submit(class="btn", style="background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; width: 100%;") }}
+        </div>
+    </form>
+
+    <p style="text-align: center;">
+        Уже есть аккаунт? <a href="{{ url_for('login') }}">Войти</a>
+    </p>
+</div>
+
+<style>
+    .form-control {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    .form-control:focus {
+        outline: none;
+        border-color: #28a745;
+    }
+    .btn:hover {
+        background: #218838 !important;
+    }
+</style>
+{% endblock %}

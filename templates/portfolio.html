@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2>📊 {{ portfolio.name }}</h2>
+    <a href="/add_transaction?portfolio_id={{ portfolio.id }}" style="background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">➕ Добавить сделку</a>
+</div>
+
+<p style="margin-bottom: 30px;">Валюта: {{ portfolio.currency }} | Создан: {{ portfolio.created_at.strftime('%d.%m.%Y') }}</p>
+
+<!-- Код для отображения портфеля (скопирован из index.html) -->
+{% set total_spent = 0 %}
+{% set total_current = 0 %}
+
+<table style="width: 100%; background: white; border-collapse: collapse; border-radius: 10px; overflow: hidden;">
+    <thead>
+        <tr style="background: #007bff; color: white;">
+            <th style="padding: 12px;">Бумага</th>
+            <th style="padding: 12px;">Тикер</th>
+            <th style="padding: 12px;">Кол-во</th>
+            <th style="padding: 12px;">Ср. цена</th>
+            <th style="padding: 12px;">Тек. цена</th>
+            <th style="padding: 12px;">Источник</th>
+            <th style="padding: 12px;">Потрачено</th>
+            <th style="padding: 12px;">Сейчас</th>
+            <th style="padding: 12px;">Прибыль</th>
+            <th style="padding: 12px;">%</th>
+            <th style="padding: 12px;">Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in portfolio_data %}
+        <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">{{ item.name }}</td>
+            <td style="padding: 12px;">{{ item.ticker }}</td>
+            <td style="padding: 12px;">{{ item.quantity }}</td>
+            <td style="padding: 12px;">{{ item.avg_price }}</td>
+            <td style="padding: 12px;">{{ item.current_price }}</td>
+            <td style="padding: 12px;">
+                <span style="padding: 3px 8px; border-radius: 12px; background: {{ '#28a745' if item.price_source == 'биржа' else '#e9ecef' }}; color: {{ 'white' if item.price_source == 'биржа' else '#495057' }};">
+                    {{ item.price_source }}
+                </span>
+            </td>
+            <td style="padding: 12px;">{{ item.spent }}</td>
+            <td style="padding: 12px;">{{ item.current_value }}</td>
+            <td style="padding: 12px; color: {{ 'green' if item.profit >= 0 else 'red' }};">{{ item.profit }}</td>
+            <td style="padding: 12px; color: {{ 'green' if item.profit_percent >= 0 else 'red' }};">{{ item.profit_percent }}%</td>
+            <td style="padding: 12px;">
+                <a href="/delete_transaction/{{ item.transaction_id }}" style="color: red; text-decoration: none;" onclick="return confirm('Удалить сделку?')">❌</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div style="margin-top: 30px;">
+    <a href="/portfolios">← Назад к портфелям</a>
+</div>
+{% endblock %}

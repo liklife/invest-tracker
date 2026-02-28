@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>📊 Графики и аналитика: {{ portfolio.name }}</h2>
+
+<div style="display: flex; gap: 20px; margin-bottom: 30px;">
+    <a href="/charts/{{ portfolio.id }}?type=portfolio" style="background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Стоимость</a>
+    <a href="/charts/{{ portfolio.id }}?type=dividends" style="background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Дивиденды</a>
+    <a href="/charts/{{ portfolio.id }}?type=sectors" style="background: #ffc107; color: black; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Отрасли</a>
+    <a href="/charts/{{ portfolio.id }}?type=profit" style="background: #17a2b8; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Доходность</a>
+</div>
+
+<!-- ГРАФИК СТОИМОСТИ -->
+{% if chart_type == 'portfolio' %}
+<div style="background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+    <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+        <select id="periodSelect" style="padding: 8px;">
+            <option value="all">Весь период</option>
+            <option value="year">Последний год</option>
+            <option value="month">Последний месяц</option>
+        </select>
+
+        <input type="date" id="fromDate" style="padding: 8px;">
+        <span style="align-self: center;">—</span>
+        <input type="date" id="toDate" style="padding: 8px;">
+
+        <button onclick="updatePortfolioChart()" style="background: #007bff; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">Применить</button>
+    </div>
+
+    <canvas id="portfolioChart"></canvas>
+</div>
+
+<script>
+    let portfolioChart;
+
+    function updatePortfolioChart() {
+        const period = document.getElementById('periodSelect').value;
+        const fromDate = document.getElementById('fromDate').value;
+        const toDate = document.getElementById('toDate').value;
+
+        let url = `/api/portfolio_history/{{ portfolio.id }}?period=${period}`;
+        if (fromDate) url += `&from=${fromDate}`;
+        if (toDate) url += `&to=${toDate}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (portfolioChart) {
+                    portfolioChart.destroy();
+                }
+
+                const ctx = document.getElementById('portfolioChart').getContext('2d');
+                portfolioChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.dates,
+                        datasets: [{
+                            label: 'Стоимость портфеля (₽)',
+                            data: data.values,
+                            borderColor: 'rgb(0, 123, 255)',
+                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                            tension: 0.1,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Динамика стоимости портфеля'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            });
+    }
+
+    updatePortfolioChart();
+</script>
+{% endif %}
+
+<!-- ГРАФИК ДИВИДЕНДОВ -->
+{% if chart_type == 'dividends' %}
+<div style="background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+    <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+        <select id="dividendPeriodSelect" style="padding: 8px;">
+            <option value="all">Все годы</option>
+            <option value="5">Последние 5 лет</option>
+            <option value="3">Последние 3 года</option>
+        </select>
+
+        <input type="date" id="dividendFromDate" style="padding: 8px;">
+        <span style="align-self: center;">—</span>
+        <input type="date" id="dividendToDate" style="padding: 8px;">
+
+        <button onclick="updateDividendChart()" style="background: #28a745; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">Применить</button>
+    </div>
+
+    <canvas id="dividendsChart"></canvas>
+</div>
+
+<script>
+    let dividendsChart;
+
+    function updateDividendChart() {
+        const period = document.getElementById('dividendPeriodSelect').value;
+        const fromDate = document.getElementById('dividendFromDate').value;
+        const toDate = document.getElementById('dividendToDate').value;
+
+        let url = `/api/dividends_by_year/{{ portfolio.id }}`;
+        if (fromDate) url += `?from=${fromDate}`;
+        if (toDate) url += `&to=${toDate}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (dividendsChart) {
+                    dividendsChart.destroy();
+                }
+
+                // Фильтруем по годам если выбран период
+                let years = data.years;
+                let values = data.values;
+
+                if (period === '5') {
+                    years = years.slice(-5);
+                    values = values.slice(-5);
+                } else if (period === '3') {
+                    years = years.slice(-3);
+                    values = values.slice(-3);
+                }
+
+                const ctx = document.getElementById('dividendsChart').getContext('2d');
+                dividendsChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: years,
+                        datasets: [{
+                            label: 'Дивиденды (₽)',
+                            data: values,
+                            backgroundColor: 'rgba(40, 167, 69, 0.6)',
+                            borderColor: 'rgb(40, 167, 69)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Дивиденды по годам'
+                            }
+                        }
+                    }
+                });
+            });
+    }
+
+    updateDividendChart();
+</script>
+{% endif %}
+
+<!-- ГРАФИК ОТРАСЛЕЙ -->
+{% if chart_type == 'sectors' %}
+<div style="background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+    <canvas id="sectorsChart"></canvas>
+</div>
+
+<script>
+    fetch('/api/sectors/{{ portfolio.id }}')
+        .then(response => response.json())
+        .then(data => {
+            new Chart(document.getElementById('sectorsChart'), {
+                type: 'pie',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.values,
+                        backgroundColor: [
+                            '#007bff', '#28a745', '#ffc107', '#dc3545',
+                            '#17a2b8', '#6610f2', '#fd7e14', '#e83e8c'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Распределение по отраслям'
+                        }
+                    }
+                }
+            });
+        });
+</script>
+{% endif %}
+
+<!-- ГРАФИК ДОХОДНОСТИ -->
+{% if chart_type == 'profit' %}
+<div style="background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+    <canvas id="profitChart"></canvas>
+</div>
+
+<script>
+    fetch('/api/profit_by_stock/{{ portfolio.id }}')
+        .then(response => response.json())
+        .then(data => {
+            new Chart(document.getElementById('profitChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Прибыль/убыток (₽)',
+                        data: data.values,
+                        backgroundColor: data.values.map(v => v >= 0 ? 'rgba(40, 167, 69, 0.6)' : 'rgba(220, 53, 69, 0.6)'),
+                        borderColor: data.values.map(v => v >= 0 ? 'rgb(40, 167, 69)' : 'rgb(220, 53, 69)'),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Доходность по бумагам'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+</script>
+{% endif %}
+
+<div style="margin-top: 20px;">
+    <a href="/portfolio/{{ portfolio.id }}">← Назад к портфелю</a>
+</div>
+{% endblock %}
