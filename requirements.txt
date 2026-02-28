@@ -6,3 +6,4 @@ wtforms
 beautifulsoup4
 requests
 gunicorn
+email-validator
